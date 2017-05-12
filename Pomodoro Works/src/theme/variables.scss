@@ -1,4 +1,4 @@
-﻿// Ionic Variables and Theming. For more info, please see:
+// Ionic Variables and Theming. For more info, please see:
 // http://ionicframework.com/docs/v2/theming/
 $font-path: "../assets/fonts";
 
@@ -12,12 +12,8 @@ $font-path: "../assets/fonts";
 // To view all the possible Ionic variables, see:
 // http://ionicframework.com/docs/v2/theming/overriding-ionic-variables/
 
-$text-color: #E6E6E6;
-$background-color: #303030;
 
-/*body, div, text-area, ion-navbar, ion-list, ion-footer, ion-toolbar {
-  background-color: $background-color;
-}*/
+
 
 // Named Color Variables
 // --------------------------------------------------
@@ -26,9 +22,14 @@ $background-color: #303030;
 // to match your app's branding. Ionic uses a Sass map of
 // colors so you can add, rename and remove colors as needed.
 // The "primary" color is the only required color in the map.
-$colors: ( primary: #303030, secondary: #303030, danger: #f53d3d, light: #E6E6E6 );
 
-// $colors: ( primary: #387ef5, secondary: #32db64, danger: #f53d3d, light: #f4f4f4, dark: #303030, text-light: #E6E6E6, text: #777, text-dark: #565d64 );
+$colors: (
+  primary:    #387ef5,
+  secondary:  #32db64,
+  danger:     #f53d3d,
+  light:      #f4f4f4,
+  dark:       #222
+);
 
 
 // App iOS Variables
@@ -60,6 +61,7 @@ $colors: ( primary: #303030, secondary: #303030, danger: #f53d3d, light: #E6E6E6
 // default are overridden.
 
 @import "ionic.theme.default";
+
 
 // Ionicons
 // --------------------------------------------------
