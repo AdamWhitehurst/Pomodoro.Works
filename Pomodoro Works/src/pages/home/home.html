@@ -1,51 +1,49 @@
-<ion-header>
-  <ion-navbar>
-    <ion-title>
-      Ionic Blank
-    </ion-title>
+﻿<ion-header>
+   <ion-navbar color="primary">
+    <ion-title text-center text-uppercase>Pomodoro.Works</ion-title>
   </ion-navbar>
 </ion-header>
-
 <ion-content class="home" padding>
+  <h4 margin-top>Start a Timer: </h4>
+  <ion-list>
+    <ion-item>
+      <ion-select id ="time-selector" class="time-selector" interface="popover">
+        <ion-option (ionSelect)="startTimer(1, false)"> 1 second (test)</ion-option>
+        <ion-option (ionSelect)="startTimer(300, true)"> 5 minutes (break)</ion-option>
+        <ion-option (ionSelect)="startTimer(900, false)"> 15 minutes</ion-option>
+        <ion-option (ionSelect)="startTimer(1200, false)"> 20 minutes</ion-option>
+        <ion-option (ionSelect)="startTimer(1500, false)"> 25 minutes</ion-option>
+      </ion-select>
+    </ion-item>
 
-    <h2 class="center">Ionic 2 - Blank Starter</h2> 
+    <!--<ion-item class="timer-content" text-center>
+      <p id="current-time">99:99</p>
+      <p id="end-time">END TIME: 99:99</p>
+      <button id="stop-button" padding ion-button icon-only full color="dark" (click)="stopAlarm();">
+        <ion-icon padding name="square" color="danger"></ion-icon>
+      </button>
+    </ion-item>-->
+  </ion-list>
 
-    <div class="center">
-        <p class="ionic-logo"></p>
-    </div>
+  <br />
 
-    <ion-card>
-        <ion-card-header>
-            Docs are here to help you
-        </ion-card-header>
+  <h4>Leave Some Notes: </h4>
+  <hr />
+  <textarea placeholder="NOTES GO HERE"></textarea>
 
-        <ion-list>
-            <button ion-item (click)="onLink('http://go.microsoft.com/fwlink/?LinkID=820516')">
-                <ion-icon name="jet" item-left></ion-icon>
-                Getting Started
-            </button>
+  <ion-footer>
+    <ion-toolbar text-center text-uppercase no-margin color="primary">
+      <div id="timer-content">
+        <p id="current-time">99:99</p>
+        <p id="end-time">END TIME: 99:99</p>
+        <button id="stop-button" padding ion-button icon-only full color="dark" (click)="stopAlarm();">
+          <ion-icon padding name="square" color="danger"></ion-icon>
+        </button>
+      </div>
+      <p id="tally">Running tally: 9999</p>
+    </ion-toolbar>
+  </ion-footer>
 
-            <button ion-item (click)="onLink('http://go.microsoft.com/fwlink/?LinkID=820761')">
-                <ion-icon name="ionic" item-left></ion-icon>
-                Ionic Framework
-            </button>
-
-            <button ion-item (click)="onLink('http://go.microsoft.com/fwlink/?LinkID=820520')">
-                <ion-icon name="thunderstorm" item-left></ion-icon>
-                Azure Services
-            </button>
-
-            <button ion-item (click)="onLink('http://go.microsoft.com/fwlink/?LinkID=820524')">
-                <ion-icon name="cafe" item-left></ion-icon>
-                Plugins Support
-            </button>
-
-            <button ion-item (click)="onLink('http://go.microsoft.com/fwlink/?LinkID=820526')">
-                <ion-icon name="paw" item-left></ion-icon>
-                Troubleshooting
-            </button>
-        </ion-list>
-        
-    </ion-card>
-
+  <!--http://soundbible.com/2070-Railroad-Crossing-Bell.html-->
+  <audio id="alarm" src="assets/sounds/railroad_crossing_bell.mp3"></audio>
 </ion-content>

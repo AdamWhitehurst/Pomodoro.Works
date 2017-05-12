@@ -1,7 +1,7 @@
 {
-  "name": "io.cordova.myapp60453c",
-  "author": "",
-  "homepage": "",
+  "name": "dev.AdamWhitehurst.PomodoroWorks",
+  "author": "Adam Whitehurst",
+  "homepage": "Pomodoro Works",
   "private": true,
   "scripts": {
     "clean": "ionic-app-scripts clean",
@@ -32,7 +32,7 @@
     "@ionic/app-scripts": "1.1.0",
     "typescript": "2.0.9"
   },
-  "description": "Ionic2Blank: An Ionic project",
+  "description": "The official app for Pomodoro Works, your #1 Pomodoro Technique App!",
   "cordovaPlugins": [
     "cordova-plugin-whitelist",
     "cordova-plugin-console",
