@@ -42,7 +42,7 @@ export class HomePage {
                 if (!isBreak) {
                     this.counter++;
                 }
-                this.tallyElem.textContent = `Running Tally: ${this.counter}`
+                this.tallyElem.textContent = `POMODOROS FINISHED: ${this.counter}`
 
                 this.stopTimer();
                 this.playAlarm();
