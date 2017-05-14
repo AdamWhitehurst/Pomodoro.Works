@@ -1,5 +1,5 @@
 ﻿<ion-header>
-   <ion-navbar color="primary">
+   <ion-navbar color="secondary">
      <img class="pomodoro-icon" src="assets/icon/icon.png" />
     <ion-title text-center text-uppercase>Pomodoro.Works</ion-title>
   </ion-navbar>
@@ -36,6 +36,13 @@
       </div>
     </ion-toolbar>
   </ion-footer>
+
+  <ion-fab bottom right>
+    <button ion-fab mini color="danger" (click)="openURL('http://cirillocompany.de/pages/pomodoro-technique/')">
+      <ion-icon name="help">
+      </ion-icon>
+    </button>
+  </ion-fab>
 
   <!--http://soundbible.com/2070-Railroad-Crossing-Bell.html-->
   <audio id="alarm" src="assets/sounds/railroad_crossing_bell.mp3"></audio>

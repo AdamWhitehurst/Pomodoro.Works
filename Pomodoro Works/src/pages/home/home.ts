@@ -1,6 +1,8 @@
 ﻿import { Component } from '@angular/core';
-
+import { InAppBrowser } from 'ionic-native';
 import { NavController } from 'ionic-angular';
+import { File } from 'ionic-native';
+declare var cordova: any;
 
 @Component({
     selector: 'page-home',
@@ -95,5 +97,9 @@ export class HomePage {
         } else {
             this.startTimer(330, true);
         }
+    }
+
+    openURL(url: string) {
+       new InAppBrowser(url, '_self');
     }
 }
