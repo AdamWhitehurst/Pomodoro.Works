@@ -3,6 +3,12 @@
 page-home {
   font-family: 'roboto', 'sans-serif';
 
+  .pomodoro-icon {
+    position: absolute;
+    top: 0;
+    height: 100%;
+  }
+
   ion-navbar, ion-toolbar, ion-header, ion-footer, ion-content, ion-list, ion-item, ion-option {
     font-style: normal !important;
     font-weight: 100 !important;
@@ -37,6 +43,7 @@ page-home {
     min-width: 100%;
     max-width: 100%;
     overflow-y: auto;
+    height: 50%;
   }
 
   @-webkit-keyframes spin {
