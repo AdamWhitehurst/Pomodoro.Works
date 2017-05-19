@@ -30,19 +30,9 @@ export class HomePage {
     constructor(public navCtrl: NavController, public modalCtrl: ModalController) {
     }
 
-    ionViewDidLoad() {
-        // Initialize the alarm
+    initAlarm() {
         this.alarm = new Alarm();
-        this.alarm.getAlarmUrls();
-
-        // Reference elements
-        this.timeSelectorElem = document.getElementById('time-selector');
-        this.timerContentElem = document.getElementById('timer-content');
-        this.tallyElem = document.getElementById('tally');
-        this.alarmElem = document.getElementById('alarm');
-        this.stopButtonElem = document.getElementById('stop-button');
-        this.endTimeElem = document.getElementById('end-time');
-        this.curTimeElem = document.getElementById('current-time');
+        this.alarm.getRingtones();
     }
 
     selectRingtone() {
@@ -54,7 +44,7 @@ export class HomePage {
             let modal = this.modalCtrl.create(RingtoneSelectModal, this.alarm.ringtones);
 
             modal.onDidDismiss(function (toneUrl) {
-                this.alarm.setAlarmUrl(toneUrl);
+                this.alarm.setRingtone(toneUrl);
             }.bind(this));
 
             modal.present();
@@ -62,6 +52,13 @@ export class HomePage {
     }
 
     startTimer(seconds: number, isBreak: boolean) {
+        this.timeSelectorElem = document.getElementById('time-selector');
+        this.timerContentElem = document.getElementById('timer-content');
+        this.tallyElem = document.getElementById('tally');
+        this.alarmElem = document.getElementById('alarm');
+        this.stopButtonElem = document.getElementById('stop-button');
+        this.endTimeElem = document.getElementById('end-time');
+        this.curTimeElem = document.getElementById('current-time');
 
         clearInterval(this.countdown);
 
@@ -114,15 +111,14 @@ export class HomePage {
     playAlarm() {
         this.timerContentElem.style.display = 'block';
         this.stopButtonElem.style.display = 'block';
-
-        this.alarm.startAlarm();
+        //this.alarmElem.play();
+        this.alarm.playRingtone();
     }
 
     stopAlarm() {
         this.timerContentElem.style.display = 'none';
         this.stopButtonElem.style.display = 'none';
-
-        this.alarm.stopAlarm();
+        this.alarm.stopRingtone();
 
         if (this.counter >= 4) {
             this.counter = 0;
