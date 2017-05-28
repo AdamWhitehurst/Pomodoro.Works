@@ -1,17 +1,22 @@
 ﻿import { NgModule, ErrorHandler } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
+import { IonicStorageModule } from '@ionic/storage';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { RingtoneSelectModal } from "../lib/alarm";
+import { LocalNotifications } from '@ionic-native/local-notifications';
+// import { MediaPlugin, MediaObject } from '@ionic-native/media';
+import { NativeAudio } from '@ionic-native/native-audio';
 
 @NgModule({
   declarations: [
     MyApp,
     HomePage,
-    RingtoneSelectModal
+      RingtoneSelectModal
   ],
   imports: [
-    IonicModule.forRoot(MyApp)
+      IonicModule.forRoot(MyApp),
+      IonicStorageModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -19,6 +24,6 @@ import { RingtoneSelectModal } from "../lib/alarm";
     HomePage,
     RingtoneSelectModal
   ],
-  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}]
+  providers: [{ provide: ErrorHandler, useClass: IonicErrorHandler }, LocalNotifications, NativeAudio]
 })
 export class AppModule {}

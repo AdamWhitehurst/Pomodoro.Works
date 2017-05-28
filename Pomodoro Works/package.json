@@ -20,7 +20,6 @@
     "@angular/platform-browser": "2.2.1",
     "@angular/platform-browser-dynamic": "2.2.1",
     "@angular/platform-server": "2.2.1",
-    "@ionic/storage": "1.1.7",
     "ionic-angular": "2.0.1",
     "ionic-native": "2.4.1",
     "ionicons": "3.0.0",
@@ -34,6 +33,7 @@
   },
   "description": "The official app for Pomodoro Works, your #1 Pomodoro Technique App!",
   "cordovaPlugins": [
+    "cordova-plugin-media",
     "cordova-plugin-whitelist",
     "cordova-plugin-console",
     "cordova-plugin-statusbar",
@@ -43,6 +43,8 @@
   ],
   "cordovaPlatforms": [],
   "-vs-binding": {
-    "BeforeBuild": [ "ionic:build" ]
+    "BeforeBuild": [
+      "ionic:build"
+    ]
   }
 }

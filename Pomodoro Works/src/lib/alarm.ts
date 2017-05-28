@@ -1,80 +1,58 @@
 ﻿import { Component } from '@angular/core';
 import { ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
-
+import { LocalNotifications } from '@ionic-native/local-notifications';
+import { NativeAudio } from '@ionic-native/native-audio';
 declare var cordova: any;
 
 @Component({
 })
-export class Alarm {
-    ringtone: string = "assets/sounds/kitchen_timer_ding";
-    ringtones;
-    play: boolean = false;
 
-    setAlarmUrl(toneUrl: string) {
-        if (toneUrl) {
-            this.ringtone = toneUrl;
-        }
+export class Alarm {
+    alarmUrls;
+    alarmUrl;
+
+    constructor(public plt: Platform, public localNotifications: LocalNotifications) {
+        this.localNotifications.on('trigger', function(notification, state) {
+            this.onAlarmTriggered(notification, state);
+        }.bind(this));
+
+        this.localNotifications.on('clear', function(notification, state) {
+            this.clearAllNotifications();
+        }.bind(this));
+
+        this.alarmUrl = 'file://assets/sounds/kitchen_timer_ding.mp3';
     }
 
-    getAlarmUrls() {
-        cordova.plugins.NativeRingtones.getRingtone(
-            function (success) {
-              this.ringtones = success;
-            }.bind(this),
-            function (err) {
-                alert(err);
-            }.bind(this),
-            'alarm');
-
-        setTimeout(function () {}, 1000);
+    setAlarmUrl(url: string) {
+        this.alarmUrl = url;
     }
 
     startAlarm() {
-        this.play = true;
-        this.loopAlarm();
+        this.localNotifications.schedule({
+            id: 0,
+            title: 'Your Pomodoro Sprint is Over!',
+            led: 'FF0000',
+            sound: this.alarmUrl
+        });
     }
 
-    loopAlarm() {
-      cordova.plugins.NativeRingtones.playRingtone(this.ringtone);
-      this.delay(2000).then(() => this.checkPlay());
-    }
+    onAlarmTriggered(notification: any, state: any) {
+        navigator.vibrate(1000);
 
-    delay(milliseconds: number) {
-      return new Promise<void>(resolve => {
-          setTimeout(resolve, milliseconds);
-      });
-    }
-
-    checkPlay() {
-        if (this.play) {
-            this.loopAlarm();
+        if (notification.id == 0) {
+            this.localNotifications.schedule({
+                id: 1,
+                at: new Date(new Date().getTime() + 1000),
+                title: 'Your Pomodoro Sprint is Over!',
+                text: 'This is a reminder that your sprint is done.',
+                led: 'FF0000',
+                sound: this.alarmUrl
+            });
         }
     }
 
-
-    //loopAlarm() {
-    //    this.checkPlay().then(function (result) {
-    //        this.loopAlarm();
-    //    }.bind(this));
-    //}
-
-    //checkPlay() {
-    //    return new Promise(function (resolve, reject) {
-    //        if (this.play) {
-    //            setTimeout(function () {
-    //                cordova.plugins.NativeRingtones.playRingtone(this.ringtone);
-    //                resolve();
-    //            }.bind(this), 2000);
-    //        }
-    //        else {
-    //            reject();
-    //        }
-    //    });
-    //}
-
-    stopAlarm() {
-        cordova.plugins.NativeRingtones.stopRingtone(this.ringtone);
-        this.play = false;
+    clearAllNotifications() {
+       this.localNotifications.clearAll();
     }
 }
 
@@ -108,16 +86,31 @@ export class Alarm {
 })
 export class RingtoneSelectModal {
     ringtones: any;
+    toneUrl: any; 
 
-    constructor(public platform: Platform, public params: NavParams, public viewCtrl: ViewController, public modalCtrl: ModalController) {
-        this.ringtones = params.data;
+    onStatusUpdate = (status) => console.log(status);
+    onSuccess = () => console.log('Action is successful.');
+    onError = (error) => {
+        console.error(error); if (error.message) console.error(error.message);
+    }
+
+    constructor(public platform: Platform, public params: NavParams, public viewCtrl: ViewController, public modalCtrl: ModalController, private nativeAudio: NativeAudio) {
+        this.ringtones = new Array();
+        this.ringtones.push({ Name: 'test', Url: 'assets/sounds/kitchen_timer_ding.mp3' });
     }
 
     dismiss(toneUrl: string = 'undefined') {
       this.viewCtrl.dismiss(toneUrl);
     }
 
-    quickPlay(toneUrl: string) {
-        cordova.plugins.NativeRingtones.playRingtone(toneUrl);
+    quickPlay(url: string) {
+        this.toneUrl = url;
+        this.nativeAudio.preloadSimple(url, url).then(function () {
+            console.log(this.toneUrl);
+            this.nativeAudio.play(this.toneUrl);
+        }.bind(this), function () {
+            console.log(this.toneUrl);
+            this.nativeAudio.play(this.toneUrl);
+        }.bind(this));
     }
 }

@@ -1,10 +1,8 @@
 ﻿import { Component } from '@angular/core';
-import { InAppBrowser } from 'ionic-native';
-import { NavController } from 'ionic-angular';
-import { File } from 'ionic-native';
+import { InAppBrowser, File } from 'ionic-native';
+import { NavController, ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
 import { Alarm, RingtoneSelectModal } from "../../lib/alarm";
-import { ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
-
+import { LocalNotifications } from '@ionic-native/local-notifications';
 
 declare var cordova: any;
 
@@ -27,32 +25,27 @@ export class HomePage {
     alarmElem;
     tallyElem;
 
-    constructor(public navCtrl: NavController, public modalCtrl: ModalController) {
+    constructor(public plt: Platform, public navCtrl: NavController, public modalCtrl: ModalController, public localNotifications: LocalNotifications) {
     }
 
     ionViewDidLoad() {
-        // Initialize the alarm
-        this.alarm = new Alarm();
-        this.alarm.getAlarmUrls();
-
-        // Reference elements
-        this.timeSelectorElem = document.getElementById('time-selector');
-        this.timerContentElem = document.getElementById('timer-content');
-        this.tallyElem = document.getElementById('tally');
-        this.alarmElem = document.getElementById('alarm');
-        this.stopButtonElem = document.getElementById('stop-button');
-        this.endTimeElem = document.getElementById('end-time');
-        this.curTimeElem = document.getElementById('current-time');
+        this.plt.ready().then((src) => {
+            // Initialize the alarm
+            this.alarm = new Alarm(this.plt, this.localNotifications);
+            // Reference elements
+            this.timeSelectorElem = document.getElementById('time-selector');
+            this.timerContentElem = document.getElementById('timer-content');
+            this.tallyElem = document.getElementById('tally');
+            this.alarmElem = document.getElementById('alarm');
+            this.stopButtonElem = document.getElementById('stop-button');
+            this.endTimeElem = document.getElementById('end-time');
+            this.curTimeElem = document.getElementById('current-time');
+        });
     }
 
     selectRingtone() {
-
-        var tone;
-
-        if (this.alarm.ringtones != 'undefined') {
-
-            let modal = this.modalCtrl.create(RingtoneSelectModal, this.alarm.ringtones);
-
+        if (this.alarm.alarmUrls != 'undefined') {
+            let modal = this.modalCtrl.create(RingtoneSelectModal, this.alarm.alarmUrls);
             modal.onDidDismiss(function (toneUrl) {
                 this.alarm.setAlarmUrl(toneUrl);
             }.bind(this));
