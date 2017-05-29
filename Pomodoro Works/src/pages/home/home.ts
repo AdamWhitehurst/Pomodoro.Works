@@ -13,7 +13,7 @@ declare var cordova: any;
 
 export class HomePage {
     alarm;
-    isBreak:boolean = false;
+    isBreak: boolean = false;
     countdown;
     counter: number = 0;
 
@@ -25,8 +25,12 @@ export class HomePage {
     alarmElem;
     tallyElem;
 
-    constructor(public plt: Platform, public navCtrl: NavController, public modalCtrl: ModalController, public localNotifications: LocalNotifications) {
-    }
+    constructor(
+        private plt: Platform,
+        private navCtrl: NavController,
+        private modalCtrl: ModalController,
+        private localNotifications: LocalNotifications
+    ) { }
 
     ionViewDidLoad() {
         this.plt.ready().then((src) => {
@@ -44,14 +48,12 @@ export class HomePage {
     }
 
     selectRingtone() {
-        if (this.alarm.alarmUrls != 'undefined') {
-            let modal = this.modalCtrl.create(RingtoneSelectModal, this.alarm.alarmUrls);
-            modal.onDidDismiss(function (toneUrl) {
-                this.alarm.setAlarmUrl(toneUrl);
-            }.bind(this));
+        let modal = this.modalCtrl.create(RingtoneSelectModal);
+        modal.onDidDismiss(function (toneUrl) {
+            this.alarm.setAlarmUrl(toneUrl);
+        }.bind(this));
 
-            modal.present();
-        }
+        modal.present();
     }
 
     startTimer(seconds: number, isBreak: boolean) {
@@ -126,6 +128,6 @@ export class HomePage {
     }
 
     openURL(url: string) {
-       new InAppBrowser(url, '_self');
+        new InAppBrowser(url, '_self');
     }
 }
