@@ -3,7 +3,7 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { IonicStorageModule } from '@ionic/storage';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
-import { RingtoneSelectModal } from "../lib/alarm";
+import { RingtoneSelectModal } from "../lib/timer";
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { NativeAudio } from '@ionic-native/native-audio';
 

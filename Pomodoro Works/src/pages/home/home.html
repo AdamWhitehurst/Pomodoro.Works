@@ -9,11 +9,11 @@
   <ion-list>
     <ion-item>
       <ion-select id ="time-selector" class="time-selector" interface="action-sheet">
-        <ion-option (ionSelect)="startTimer(1, false)"> 1 second (test)</ion-option>
-        <ion-option (ionSelect)="startTimer(300, true)"> 5 minutes (break)</ion-option>
-        <ion-option (ionSelect)="startTimer(900, false)"> 15 minutes</ion-option>
-        <ion-option (ionSelect)="startTimer(1200, false)"> 20 minutes</ion-option>
-        <ion-option (ionSelect)="startTimer(1500, false)"> 25 minutes</ion-option>
+        <ion-option (ionSelect)="startCountdownTimer(1, false)"> 1 second (test)</ion-option>
+        <ion-option (ionSelect)="startCountdownTimer(300, true)"> 5 minutes (break)</ion-option>
+        <ion-option (ionSelect)="startCountdownTimer(900, false)"> 15 minutes</ion-option>
+        <ion-option (ionSelect)="startCountdownTimer(1200, false)"> 20 minutes</ion-option>
+        <ion-option (ionSelect)="startCountdownTimer(1500, false)"> 25 minutes</ion-option>
       </ion-select>
     </ion-item>
   </ion-list>
@@ -30,7 +30,7 @@
         <p id="current-time">99:99</p>
         <p id="end-time">END TIME: 99:99</p>
         <p id="tally">POMODORO'S FINISHED: 0</p>
-        <button id="stop-button" padding ion-button icon-only full color="dark" (click)="stopAlarm();">
+        <button id="stop-button" padding ion-button icon-only full color="dark" (click)="stopAlarm()">
           <ion-icon padding name="square" color="danger"></ion-icon>
         </button>
       </div>
@@ -46,6 +46,4 @@
       </button>
     </ion-fab-list>
   </ion-fab>
-
-  <audio id="alarm" src="assets/sounds/kitchen_timer_ding.mp3"></audio>
 </ion-content>

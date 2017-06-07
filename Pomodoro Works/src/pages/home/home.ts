@@ -1,8 +1,9 @@
 ﻿import { Component } from '@angular/core';
 import { InAppBrowser, File } from 'ionic-native';
 import { NavController, ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
-import { Alarm, RingtoneSelectModal } from "../../lib/alarm";
 import { LocalNotifications } from '@ionic-native/local-notifications';
+import { NativeAudio } from "@ionic-native/native-audio";
+import { Timer } from "../../lib/timer";
 
 declare var cordova: any;
 
@@ -12,10 +13,7 @@ declare var cordova: any;
 })
 
 export class HomePage {
-    alarm;
-    isBreak: boolean = false;
-    countdown;
-    counter: number = 0;
+    timer: Timer;
 
     timerContentElem;
     timeSelectorElem;
@@ -29,13 +27,13 @@ export class HomePage {
         private plt: Platform,
         private navCtrl: NavController,
         private modalCtrl: ModalController,
-        private localNotifications: LocalNotifications
+        private localNotification: LocalNotifications,
+        private nativeAudio: NativeAudio
     ) { }
 
     ionViewDidLoad() {
-        this.plt.ready().then((src) => {
-            // Initialize the alarm
-            this.alarm = new Alarm(this.plt, this.localNotifications);
+            // Initialize the timer
+            this.timer = new Timer(this.localNotification, this.modalCtrl, this.nativeAudio);
             // Reference elements
             this.timeSelectorElem = document.getElementById('time-selector');
             this.timerContentElem = document.getElementById('timer-content');
@@ -44,51 +42,36 @@ export class HomePage {
             this.stopButtonElem = document.getElementById('stop-button');
             this.endTimeElem = document.getElementById('end-time');
             this.curTimeElem = document.getElementById('current-time');
-        });
     }
 
     selectRingtone() {
-        let modal = this.modalCtrl.create(RingtoneSelectModal);
-        modal.onDidDismiss(function (toneUrl) {
-            this.alarm.setAlarmUrl(toneUrl);
-        }.bind(this));
-
-        modal.present();
+        this.timer.selectRingtone();
     }
 
-    startTimer(seconds: number, isBreak: boolean) {
+    startCountdownTimer(seconds: number, isBreak: boolean) {
+        const startTime = Date.now();
+        const endTime = startTime + (seconds * 1000);
 
-        clearInterval(this.countdown);
+        if (this.timer) {
+            this.timer.startCountdown(endTime, isBreak, this.onCountdownUpdate.bind(this), this.onCountdownDone.bind(this));
+            this.timerContentElem.style.display = 'block';
+            this.displayTimeLeft(seconds);
+            this.displayEndTime(endTime);
+        }
+        else {
+            console.error("Timer not defined!");
+        }
 
-        const timeStart = Date.now();
-        const timeEnd = timeStart + (seconds * 1000);
+    }
 
-        this.countdown = setInterval(function () {
-            const secondsLeft = Math.round((timeEnd - Date.now()) / 1000);
-            if (secondsLeft <= 0) {
-                if (!isBreak) {
-                    this.counter++;
-                }
-                this.tallyElem.textContent = `POMODOROS FINISHED: ${this.counter}`
-
-                this.stopTimer();
-                this.playAlarm();
-
-                return;
-            }
-            this.displayTimeLeft(secondsLeft);
-        }.bind(this), 1000);
-
+    onCountdownDone() {
         this.timerContentElem.style.display = 'block';
-        this.displayTimeLeft(seconds);
-        this.displayEndTime(timeEnd);
-
+        this.stopButtonElem.style.display = 'block';
+        this.tallyElem.textContent = `POMODOROS FINISHED: ${this.timer.counter}`;
     }
 
-    stopTimer() {
-        this.curTimeElem.textContent = 'No time selected';
-        this.endTimeElem.textContent = 'grab a coffee';
-        clearInterval(this.countdown);
+    onCountdownUpdate(seconds) {
+        this.displayTimeLeft(seconds);
     }
 
     displayTimeLeft(seconds) {
@@ -106,24 +89,14 @@ export class HomePage {
         this.endTimeElem.textContent = `End time: ${hours > 12 ? hours - 12 : hours}:${minutes < 10 ? '0' : ''}${minutes}`;
     }
 
-    playAlarm() {
-        this.timerContentElem.style.display = 'block';
-        this.stopButtonElem.style.display = 'block';
-
-        this.alarm.startAlarm();
-    }
-
     stopAlarm() {
         this.timerContentElem.style.display = 'none';
-        this.stopButtonElem.style.display = 'none';
 
-        this.alarm.stopAlarm();
-
-        if (this.counter >= 4) {
-            this.counter = 0;
-            this.startTimer(1800, false);
+        if (this.timer.counter >= 4) {
+            this.timer.counter = 0;
+            this.startCountdownTimer(1800, false);
         } else {
-            this.startTimer(330, true);
+            this.startCountdownTimer(330, true);
         }
     }
 
