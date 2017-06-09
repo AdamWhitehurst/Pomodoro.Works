@@ -131,10 +131,11 @@ export class Timer {
       <ion-item *ngFor="let tone of ALARM_LIST">
         <ion-title>{{tone.Name}}</ion-title>
         <ion-note item-end>
-           <button ion-button color="secondary" (click)="this.viewCtrl.dismiss(tone.Url)"><ion-icon name="checkmark"></ion-icon> Select</button>
-          <button ion-button color="secondary" (click)="quickPlay(tone.Url)"><ion-icon name="musical-note"></ion-icon> Play</button>
-          </ion-note>
-      </ion-item>
+          <button ion-button color="secondary" (click)="this.viewCtrl.dismiss(tone.Url)"><ion-icon name="checkmark"></ion-icon> Select</button>
+          <button ion-button color="secondary" (click)="play(tone.Url)"><ion-icon name="musical-note"></ion-icon> Play</button>
+          <button ion-button color="secondary" (click)="stop(tone.Url)"><ion-icon name="close"></ion-icon> Stop</button>
+        </ion-note>
+     </ion-item>
   </ion-list>
 </ion-content>
 `
@@ -149,8 +150,12 @@ export class RingtoneSelectModal {
         this.alarm = navParams.get('alrm');
     }
 
-    quickPlay(url: string) {
+    play(url: string) {
         this.alarm.startAlarm(url);
+    }
+
+    stop(url: string) {
+        this.alarm.stopAlarm();
     }
 
     get ALARM_LIST() {

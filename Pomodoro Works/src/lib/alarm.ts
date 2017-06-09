@@ -17,15 +17,13 @@ export class Alarm {
         private nativeAudio: NativeAudio,
         private storage: Storage
     ) {
-        this.lastAudioId = 'assets/sounds/kitchen_timer.mp3';
-
         storage.get('alarm_url').then(
             function (value) {
                 if (value) {
                     this.alarmUrl = value;
                 }
                 else {
-                    console.error('alarm_url was null. Setting to default: assets/ sounds / kitchen_timer.mp3');
+                    console.error('alarm_url was null. Setting to default: assets/sounds/kitchen_timer.mp3');
                     this.setUrl('assets/sounds/kitchen_timer.mp3');
                 }
             }.bind(this),
@@ -44,35 +42,47 @@ export class Alarm {
             this.storage.set('alarm_url', url);
             this.alarmUrl = url;
         }
-        else {
-            console.error('setAlarmUrl failed: ' + url);
-        }
     }
 
     startAlarm(url: string = this.alarmUrl) {
-        this.stopAlarm(this.lastAudioId);
-
-        this.nativeAudio.loop(url).then(function () {
-            this.lastAudioId = url;
-        }.bind(this), function (error) {
-            console.error('startAlarm Error: ' + error + " Audio id: " + url);
-            this.loadAndPlayTone(url);
-        }.bind(this));
+        // Attempt to stop the previous alarm tone
+        if (this.lastAudioId) {
+            this.stopAlarm().catch(
+                function (error) {
+                    console.log('stopAlarm failed. ' + error);
+                });
+        }
+        // play new tone
+        this.playTone(url).catch(
+            // playTone failure
+            function () {
+                // Attempt load tone, then play tone again
+                this.loadTone(url).then(
+                    function () {
+                        this.playTone(url)
+                    }.bind(this)
+                )
+            }.bind(this)
+        );
     }
 
-    stopAlarm(url: string = this.alarmUrl) {
-        this.nativeAudio.stop(url).then(function () { }, function (error) {
-            console.error('stopAlarm Error: ' + error + " Audio id: " + url + '\n Attempting to stop last audio id');
-            this.nativeAudio.stop(this.lastAudioId);
-        }.bind(this));
+    stopAlarm(url: string = this.lastAudioId) {
+        return this.nativeAudio.stop(url);
     }
 
-    loadAndPlayTone(url: string = this.alarmUrl) {
-        this.nativeAudio.preloadComplex(url, url, 0.9, 1, 0).then(function () {
-            this.startAlarm(url);
-        }.bind(this), function (error) {
-                console.error('loadAndPlayTone Error: ' + error);
-                this.startAlarm(this.alarmUrl);
-        }.bind(this));
+    playTone(url: string) {
+        return this.nativeAudio.loop(url).then(
+            function () {
+                this.lastAudioId = url;
+            }.bind(this)
+        );
+    }
+
+    loadTone(url: string) {
+        if (!url) {
+            throw new Error('Cannot load undefined tone! ' + url)
+        }
+
+        return this.nativeAudio.preloadComplex(url, url, 0.9, 1, 0);
     }
 }

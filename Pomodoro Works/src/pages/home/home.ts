@@ -34,16 +34,16 @@ export class HomePage {
     ) { }
 
     ionViewDidLoad() {
-            // Initialize the timer
-            this.timer = new Timer(this.localNotification, this.modalCtrl, this.nativeAudio, this.storage);
-            // Reference elements
-            this.timeSelectorElem = document.getElementById('time-selector');
-            this.timerContentElem = document.getElementById('timer-content');
-            this.tallyElem = document.getElementById('tally');
-            this.alarmElem = document.getElementById('alarm');
-            this.stopButtonElem = document.getElementById('stop-button');
-            this.endTimeElem = document.getElementById('end-time');
-            this.curTimeElem = document.getElementById('current-time');
+        // Initialize the timer
+        this.timer = new Timer(this.localNotification, this.modalCtrl, this.nativeAudio, this.storage);
+        // Reference elements
+        this.timeSelectorElem = document.getElementById('time-selector');
+        this.timerContentElem = document.getElementById('timer-content');
+        this.tallyElem = document.getElementById('tally');
+        this.alarmElem = document.getElementById('alarm');
+        this.stopButtonElem = document.getElementById('stop-button');
+        this.endTimeElem = document.getElementById('end-time');
+        this.curTimeElem = document.getElementById('current-time');
     }
 
     selectRingtone() {
