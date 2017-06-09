@@ -3,6 +3,8 @@ import { Component } from "@angular/core";
 import { ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
 import { NativeAudio } from "@ionic-native/native-audio";
 import { Alarm } from "./alarm";
+import { Storage } from '@ionic/storage';
+
 declare var cordova: any;
 
 @Component({
@@ -20,9 +22,10 @@ export class Timer {
     constructor(
         private localNotifications: LocalNotifications,
         private modalCtrl: ModalController,
-        private nativeAudio: NativeAudio
+        private nativeAudio: NativeAudio,
+        private storage: Storage
     ) {
-        this.alarm = new Alarm(nativeAudio);
+        this.alarm = new Alarm(nativeAudio, storage);
 
         // Listen to notification events
         this.localNotifications.on('trigger', function (notification, state) {
@@ -38,7 +41,8 @@ export class Timer {
     selectRingtone() {
         var modal = this.modalCtrl.create(RingtoneSelectModal, { alrm: this.alarm });
         modal.onDidDismiss(function (url) {
-            this.alarm.alarmUrl = url;
+            this.alarm.stopAlarm();
+            this.alarm.setUrl(url);
         }.bind(this));
         modal.present();
     }
@@ -64,6 +68,7 @@ export class Timer {
                     icon: 'file://assets/icon/icon.png',
                     title: 'Your Pomodoro Sprint is Over!',
                     text: 'Your sprint is done. Take a break, you winner.',
+                    sound: this.alarm.getUrl(),
                     led: 'FF0000'
                 });
                 this.playAlarm();
@@ -86,12 +91,13 @@ export class Timer {
                 icon: 'file://assets/icon/icon.png',
                 title: 'Reminder: Your Pomodoro Sprint is Over!',
                 text: 'This is a reminder that your sprint is done.',
+                sound: this.alarm.getUrl(),
                 led: 'FF0000'
             });
         }
     }
 
-    clearNotifications() {
+    onNotificationCleared(notification: any, state: any) {
         this.localNotifications.clearAll();
     }
 

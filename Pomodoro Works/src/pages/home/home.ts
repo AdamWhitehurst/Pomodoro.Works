@@ -4,6 +4,7 @@ import { NavController, ModalController, Platform, NavParams, ViewController } f
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { NativeAudio } from "@ionic-native/native-audio";
 import { Timer } from "../../lib/timer";
+import { Storage } from '@ionic/storage';
 
 declare var cordova: any;
 
@@ -28,12 +29,13 @@ export class HomePage {
         private navCtrl: NavController,
         private modalCtrl: ModalController,
         private localNotification: LocalNotifications,
-        private nativeAudio: NativeAudio
+        private nativeAudio: NativeAudio,
+        private storage: Storage
     ) { }
 
     ionViewDidLoad() {
             // Initialize the timer
-            this.timer = new Timer(this.localNotification, this.modalCtrl, this.nativeAudio);
+            this.timer = new Timer(this.localNotification, this.modalCtrl, this.nativeAudio, this.storage);
             // Reference elements
             this.timeSelectorElem = document.getElementById('time-selector');
             this.timerContentElem = document.getElementById('timer-content');
