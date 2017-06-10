@@ -12,12 +12,14 @@ declare var cordova: any;
 
 export class Timer {
     public counter: number = 0;
+    public reminderNotificationEnabled: boolean;
     private alarm: Alarm;
     private isBreak: boolean = false;
     private endTime;
     private updateCallback;
     private endCallback;
     private countdown;
+    
 
     constructor(
         private localNotifications: LocalNotifications,
@@ -29,13 +31,27 @@ export class Timer {
 
         // Listen to notification events
         this.localNotifications.on('trigger', function (notification, state) {
-            this.onAlarmTriggered(notification, state);
+            this.onNotificationTriggered(notification, state);
         }.bind(this));
 
         this.localNotifications.on('clear', function (notification, state) {
             this.onNotificationCleared();
         }.bind(this));
 
+        this.loadSettings();
+    }
+
+    loadSettings() {
+        this.storage.get('reminderNotificationEnabled').then(
+            function (value) {
+                if (value) {
+                    this.reminderNotificationEnabled = value;
+                }
+                else {
+                    this.reminderNotificationEnabled = false;
+                }
+            }.bind(this)
+        );
     }
 
     selectRingtone() {
@@ -52,6 +68,7 @@ export class Timer {
         this.updateCallback = updateCallback;
         this.endCallback = endCallback;
         this.isBreak = isBreak;
+
         this.stopAlarm();
 
         this.countdown = setInterval(function () {
@@ -59,6 +76,7 @@ export class Timer {
 
             if (secondsLeft <= 0) {
                 clearInterval(this.countdown);
+
                 if (!this.isBreak) {
                     this.counter++;
                 }
@@ -71,6 +89,7 @@ export class Timer {
                     sound: this.alarm.getUrl(),
                     led: 'FF0000'
                 });
+
                 this.playAlarm();
                 this.endCallback();
 
@@ -81,10 +100,10 @@ export class Timer {
         }.bind(this), 1000);
     }
 
-    onAlarmTriggered(notification: any, state: any) {
+    onNotificationTriggered(notification: any, state: any) {
         navigator.vibrate(1000);
 
-        if (notification.id == 0) {
+        if (notification.id == 0 && this.reminderNotificationEnabled) {
             this.localNotifications.schedule({
                 id: 1,
                 at: new Date(new Date().getTime() + 60000),
@@ -97,8 +116,13 @@ export class Timer {
         }
     }
 
-    onNotificationCleared(notification: any, state: any) {
+    clearAndCancelNotifications() {
+        this.localNotifications.cancelAll();
         this.localNotifications.clearAll();
+    }
+
+    onNotificationCleared() {
+        this.clearAndCancelNotifications();
     }
 
     playAlarm(url: string) {
@@ -107,14 +131,13 @@ export class Timer {
 
     stopAlarm() {
         this.alarm.stopAlarm();
-        clearInterval(this.countdown);
     }
 }
 
 @Component({
     template: `
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="tertiary">
     <ion-title>
       Select a Ringtone
     </ion-title>
@@ -126,14 +149,14 @@ export class Timer {
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content>
+<ion-content color="secondary">
   <ion-list>
-      <ion-item *ngFor="let tone of ALARM_LIST">
-        <ion-title>{{tone.Name}}</ion-title>
+      <ion-item color="secondary" *ngFor="let tone of ALARM_LIST">
+        <ion-title><h2 style="color: #ffffff;">{{tone.Name}}</h2></ion-title>
         <ion-note item-end>
-          <button ion-button color="secondary" (click)="this.viewCtrl.dismiss(tone.Url)"><ion-icon name="checkmark"></ion-icon> Select</button>
-          <button ion-button color="secondary" (click)="play(tone.Url)"><ion-icon name="musical-note"></ion-icon> Play</button>
-          <button ion-button color="secondary" (click)="stop(tone.Url)"><ion-icon name="close"></ion-icon> Stop</button>
+          <button ion-button color="blue" (click)="this.viewCtrl.dismiss(tone.Url)"><ion-icon color="white" name="checkmark"> Select</ion-icon> </button>
+          <button ion-button color="green" (click)="play(tone.Url)"><ion-icon color="white" name="musical-note"> Play</ion-icon> </button>
+          <button ion-button color="danger" (click)="stop(tone.Url)"><ion-icon color="white" name="close"> Stop</ion-icon> </button>
         </ion-note>
      </ion-item>
   </ion-list>

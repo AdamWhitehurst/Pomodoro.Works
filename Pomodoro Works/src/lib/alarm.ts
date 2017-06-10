@@ -45,13 +45,9 @@ export class Alarm {
     }
 
     startAlarm(url: string = this.alarmUrl) {
-        // Attempt to stop the previous alarm tone
-        if (this.lastAudioId) {
-            this.stopAlarm().catch(
-                function (error) {
-                    console.log('stopAlarm failed. ' + error);
-                });
-        }
+        // Stop the previous alarm tone
+        this.stopAlarm();
+
         // play new tone
         this.playTone(url).catch(
             // playTone failure
@@ -60,14 +56,21 @@ export class Alarm {
                 this.loadTone(url).then(
                     function () {
                         this.playTone(url)
-                    }.bind(this)
+                    }.bind(this),
+                    function() {}
                 )
             }.bind(this)
         );
     }
 
     stopAlarm(url: string = this.lastAudioId) {
-        return this.nativeAudio.stop(url);
+        if (this.lastAudioId) {
+            return this.nativeAudio.stop(url).catch(
+                function (error) {
+                    console.log('stopAlarm failed. ' + error);
+                }
+            );
+        }
     }
 
     playTone(url: string) {

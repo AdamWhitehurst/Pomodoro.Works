@@ -22,7 +22,8 @@
 
   <h4>Leave Some Notes: </h4>
   <hr />
-  <textarea placeholder="NOTES GO HERE"></textarea>
+  <!-- onChange would work better than onInput but doesn't work-->
+  <textarea id="notes" placeholder="NOTES GO HERE"></textarea>
 
   <ion-footer>
     <ion-toolbar text-center text-uppercase no-margin color="primary">
@@ -30,7 +31,7 @@
         <p id="current-time">99:99</p>
         <p id="end-time">END TIME: 99:99</p>
         <p id="tally">POMODORO'S FINISHED: 0</p>
-        <button id="stop-button" padding ion-button icon-only full color="dark" (click)="stopAlarm()">
+        <button id="stop-button" padding ion-button icon-only full color="dark" (click)="onStopButtonClick()">
           <ion-icon padding name="square" color="danger"></ion-icon>
         </button>
       </div>
@@ -38,10 +39,18 @@
   </ion-footer>
 
   <ion-fab bottom right>
-    <button ion-fab mini color="danger"><ion-icon name="add"></ion-icon></button>
+    <button ion-fab mini color="danger"><ion-icon name="settings"></ion-icon></button>
     <ion-fab-list side="top">
       <button ion-fab (click)="selectRingtone()">
-        <ion-icon name="help">
+        <ion-icon color="green" name="musical-notes">
+        </ion-icon>
+      </button>
+      <button ion-fab (click)="openURL('http://cirillocompany.de/pages/pomodoro-technique/')">
+        <ion-icon color="orange" name="help">
+        </ion-icon>
+      </button>
+      <button ion-fab (click)="presentCreditsAlert()">
+        <ion-icon color="danger" name="heart">
         </ion-icon>
       </button>
     </ion-fab-list>

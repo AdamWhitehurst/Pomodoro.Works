@@ -1,6 +1,6 @@
 ﻿import { Component } from '@angular/core';
 import { InAppBrowser, File } from 'ionic-native';
-import { NavController, ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
+import { AlertController, NavController, ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { NativeAudio } from "@ionic-native/native-audio";
 import { Timer } from "../../lib/timer";
@@ -14,6 +14,7 @@ declare var cordova: any;
 })
 
 export class HomePage {
+    autoStartBreak: boolean;
     timer: Timer;
 
     timerContentElem;
@@ -23,11 +24,13 @@ export class HomePage {
     stopButtonElem;
     alarmElem;
     tallyElem;
+    notesElem;
 
     constructor(
         private plt: Platform,
         private navCtrl: NavController,
         private modalCtrl: ModalController,
+        private alertCtrl: AlertController,
         private localNotification: LocalNotifications,
         private nativeAudio: NativeAudio,
         private storage: Storage
@@ -44,10 +47,55 @@ export class HomePage {
         this.stopButtonElem = document.getElementById('stop-button');
         this.endTimeElem = document.getElementById('end-time');
         this.curTimeElem = document.getElementById('current-time');
+        this.notesElem = document.getElementById('notes');
+        // Listen for changes to notes element
+        this.notesElem.addeventListener('onchange', function () {
+            this.saveNotes();
+        }.bind(this));
+        // Load Settings
+        this.loadSettings();
+    }
+
+    loadSettings() {
+        this.storage.get('autoBreakEnabled').then(
+            function (value) {
+                if (value) {
+                    this.autoBreakEnabled = value;
+                }
+                else {
+                    this.autoBreakEnabled = false;
+                }
+            }.bind(this)
+        );
+        if (this.notesElem) {
+            this.storage.get('notes').then(
+                function (value) {
+                    console.warn("__ notes value __ " + value);
+                    this.notesElem.text(value);
+                }.bind(this)
+            );
+        }
+    }
+
+    presentCreditsAlert() {
+        var popup = this.alertCtrl.create({
+            title: 'Pomodoro.Works Timer App',
+            subTitle: 'By Adam Whitehurst',
+            message: '<p> Visit the main website:</br><a href="http://pomodoro.works/">Pomodoro.Works</a></br></br>Endless thanks to Sean Martz and the Coding Blocks Slack Community:</br><a href="http://codingblocks.slack.com/">CodingBlocks.Slack.com</a></p>',
+            cssClass: 'credits-alert',
+            buttons: ['OK']
+        });
+        popup.present();
     }
 
     selectRingtone() {
         this.timer.selectRingtone();
+    }
+
+    saveNotes() {
+        if (this.notesElem) {
+            this.storage.set('notes', this.notesElem.text());
+        }
     }
 
     startCountdownTimer(seconds: number, isBreak: boolean) {
@@ -60,10 +108,6 @@ export class HomePage {
             this.displayTimeLeft(seconds);
             this.displayEndTime(endTime);
         }
-        else {
-            console.error("Timer not defined!");
-        }
-
     }
 
     onCountdownDone() {
@@ -91,14 +135,22 @@ export class HomePage {
         this.endTimeElem.textContent = `End time: ${hours > 12 ? hours - 12 : hours}:${minutes < 10 ? '0' : ''}${minutes}`;
     }
 
-    stopAlarm() {
+    onStopButtonClick() {
         this.timerContentElem.style.display = 'none';
+        this.timer.clearAndCancelNotifications();
+        this.stopAlarm();
+    }
 
-        if (this.timer.counter >= 4) {
-            this.timer.counter = 0;
-            this.startCountdownTimer(1800, false);
-        } else {
-            this.startCountdownTimer(330, true);
+    stopAlarm() {
+        this.timer.stopAlarm();
+
+        if (this.autoStartBreak) {
+            if (this.timer.counter >= 4) {
+                this.timer.counter = 0;
+                this.startCountdownTimer(1800, false);
+            } else {
+                this.startCountdownTimer(330, true);
+            }
         }
     }
 
