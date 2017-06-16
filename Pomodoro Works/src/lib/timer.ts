@@ -1,33 +1,31 @@
-﻿import { LocalNotifications } from '@ionic-native/local-notifications';
+﻿/// <reference path="settings.ts" />
+
+import { LocalNotifications } from '@ionic-native/local-notifications';
 import { Component } from "@angular/core";
 import { ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
 import { NativeAudio } from "@ionic-native/native-audio";
 import { Alarm } from "./alarm";
-import { Storage } from '@ionic/storage';
-
 declare var cordova: any;
 
 @Component({
 })
 
 export class Timer {
-    public counter: number = 0;
-    public reminderNotificationEnabled: boolean;
     private alarm: Alarm;
     private isBreak: boolean = false;
     private endTime;
     private updateCallback;
     private endCallback;
     private countdown;
-    
+    private settings;
 
     constructor(
         private localNotifications: LocalNotifications,
         private modalCtrl: ModalController,
-        private nativeAudio: NativeAudio,
-        private storage: Storage
+        private nativeAudio: NativeAudio
     ) {
-        this.alarm = new Alarm(nativeAudio, storage);
+        this.alarm = new Alarm(nativeAudio);
+        this.settings = 
 
         // Listen to notification events
         this.localNotifications.on('trigger', function (notification, state) {
@@ -38,20 +36,6 @@ export class Timer {
             this.onNotificationCleared();
         }.bind(this));
 
-        this.loadSettings();
-    }
-
-    loadSettings() {
-        this.storage.get('reminderNotificationEnabled').then(
-            function (value) {
-                if (value) {
-                    this.reminderNotificationEnabled = value;
-                }
-                else {
-                    this.reminderNotificationEnabled = false;
-                }
-            }.bind(this)
-        );
     }
 
     selectRingtone() {
@@ -78,7 +62,7 @@ export class Timer {
                 clearInterval(this.countdown);
 
                 if (!this.isBreak) {
-                    this.counter++;
+                    this.count++;
                 }
 
                 this.localNotifications.schedule({
@@ -103,7 +87,7 @@ export class Timer {
     onNotificationTriggered(notification: any, state: any) {
         navigator.vibrate(1000);
 
-        if (notification.id == 0 && this.reminderNotificationEnabled) {
+        if (notification.id == 0 && GlobalSettings.reminderNotificationEnabled) {
             this.localNotifications.schedule({
                 id: 1,
                 at: new Date(new Date().getTime() + 60000),

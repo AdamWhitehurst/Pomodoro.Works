@@ -4,7 +4,6 @@ import { AlertController, NavController, ModalController, Platform, NavParams, V
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { NativeAudio } from "@ionic-native/native-audio";
 import { Timer } from "../../lib/timer";
-import { Storage } from '@ionic/storage';
 
 declare var cordova: any;
 
@@ -32,13 +31,12 @@ export class HomePage {
         private modalCtrl: ModalController,
         private alertCtrl: AlertController,
         private localNotification: LocalNotifications,
-        private nativeAudio: NativeAudio,
-        private storage: Storage
+        private nativeAudio: NativeAudio
     ) { }
 
     ionViewDidLoad() {
         // Initialize the timer
-        this.timer = new Timer(this.localNotification, this.modalCtrl, this.nativeAudio, this.storage);
+        this.timer = new Timer(this.localNotification, this.modalCtrl, this.nativeAudio);
         // Reference elements
         this.timeSelectorElem = document.getElementById('time-selector');
         this.timerContentElem = document.getElementById('timer-content');
@@ -113,7 +111,7 @@ export class HomePage {
     onCountdownDone() {
         this.timerContentElem.style.display = 'block';
         this.stopButtonElem.style.display = 'block';
-        this.tallyElem.textContent = `POMODOROS FINISHED: ${this.timer.counter}`;
+        this.tallyElem.textContent = `POMODOROS FINISHED: ${GlobalSettings.count}`;
     }
 
     onCountdownUpdate(seconds) {
@@ -145,8 +143,8 @@ export class HomePage {
         this.timer.stopAlarm();
 
         if (this.autoStartBreak) {
-            if (this.timer.counter >= 4) {
-                this.timer.counter = 0;
+            if (this.timer.count >= 4) {
+                this.timer.count = 0;
                 this.startCountdownTimer(1800, false);
             } else {
                 this.startCountdownTimer(330, true);

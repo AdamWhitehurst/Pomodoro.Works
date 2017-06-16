@@ -2,7 +2,6 @@
 import { ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { NativeAudio } from '@ionic-native/native-audio';
-import { Storage } from '@ionic/storage';
 
 declare var cordova: any;
 
@@ -14,23 +13,8 @@ export class Alarm {
     private lastAudioId: string;
 
     constructor(
-        private nativeAudio: NativeAudio,
-        private storage: Storage
+        private nativeAudio: NativeAudio
     ) {
-        storage.get('alarm_url').then(
-            function (value) {
-                if (value) {
-                    this.alarmUrl = value;
-                }
-                else {
-                    console.error('alarm_url was null. Setting to default: assets/sounds/kitchen_timer.mp3');
-                    this.setUrl('assets/sounds/kitchen_timer.mp3');
-                }
-            }.bind(this),
-            function (error) {
-                this.alarmUrl = 'assets/sounds/kitchen_timer.mp3';
-                console.error('get alarm_url failed: ' + error + '\nSetting to default: assets/ sounds / kitchen_timer.mp3');
-            });
     }
 
     getUrl() {
