@@ -1,5 +1,6 @@
 ﻿/// <reference path="settings.ts" />
 
+import { GlobalSettings } from './settings';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { Component } from "@angular/core";
 import { ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
@@ -24,8 +25,8 @@ export class Timer {
         private modalCtrl: ModalController,
         private nativeAudio: NativeAudio
     ) {
-        this.alarm = new Alarm(nativeAudio);
-        this.settings = 
+        this.settings = GlobalSettings.instance();
+        this.alarm = new Alarm(nativeAudio, this.settings.alarmUrl);
 
         // Listen to notification events
         this.localNotifications.on('trigger', function (notification, state) {
@@ -87,7 +88,7 @@ export class Timer {
     onNotificationTriggered(notification: any, state: any) {
         navigator.vibrate(1000);
 
-        if (notification.id == 0 && GlobalSettings.reminderNotificationEnabled) {
+        if (notification.id == 0 && this.settings.reminderNotificationEnabled) {
             this.localNotifications.schedule({
                 id: 1,
                 at: new Date(new Date().getTime() + 60000),

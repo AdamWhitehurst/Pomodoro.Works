@@ -13,17 +13,18 @@ export class Alarm {
     private lastAudioId: string;
 
     constructor(
-        private nativeAudio: NativeAudio
+        private nativeAudio: NativeAudio,
+        private url: string
     ) {
+        this.alarmUrl = url;
     }
 
     getUrl() {
-        return this.alarmUrl;
+        if (this.alarmUrl) return this.alarmUrl;
     }
 
     setUrl(url: string) {
         if (url) {
-            this.storage.set('alarm_url', url);
             this.alarmUrl = url;
         }
     }

@@ -4,6 +4,8 @@ import { AlertController, NavController, ModalController, Platform, NavParams, V
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { NativeAudio } from "@ionic-native/native-audio";
 import { Timer } from "../../lib/timer";
+import { Storage } from '@ionic/storage';
+import { GlobalSettings } from '../../lib/settings';
 
 declare var cordova: any;
 
@@ -15,6 +17,7 @@ declare var cordova: any;
 export class HomePage {
     autoStartBreak: boolean;
     timer: Timer;
+    settings: GlobalSettings;
 
     timerContentElem;
     timeSelectorElem;
@@ -31,8 +34,12 @@ export class HomePage {
         private modalCtrl: ModalController,
         private alertCtrl: AlertController,
         private localNotification: LocalNotifications,
-        private nativeAudio: NativeAudio
-    ) { }
+        private nativeAudio: NativeAudio,
+        private storage: Storage
+    ) {
+        // Init Settings
+        this.settings = new GlobalSettings(storage);
+    }
 
     ionViewDidLoad() {
         // Initialize the timer
@@ -47,32 +54,9 @@ export class HomePage {
         this.curTimeElem = document.getElementById('current-time');
         this.notesElem = document.getElementById('notes');
         // Listen for changes to notes element
-        this.notesElem.addeventListener('onchange', function () {
+        this.notesElem.addEventListener('onchange', function () {
             this.saveNotes();
         }.bind(this));
-        // Load Settings
-        this.loadSettings();
-    }
-
-    loadSettings() {
-        this.storage.get('autoBreakEnabled').then(
-            function (value) {
-                if (value) {
-                    this.autoBreakEnabled = value;
-                }
-                else {
-                    this.autoBreakEnabled = false;
-                }
-            }.bind(this)
-        );
-        if (this.notesElem) {
-            this.storage.get('notes').then(
-                function (value) {
-                    console.warn("__ notes value __ " + value);
-                    this.notesElem.text(value);
-                }.bind(this)
-            );
-        }
     }
 
     presentCreditsAlert() {
@@ -92,7 +76,7 @@ export class HomePage {
 
     saveNotes() {
         if (this.notesElem) {
-            this.storage.set('notes', this.notesElem.text());
+            this.settings.notes = this.notesElem.text();
         }
     }
 
@@ -111,7 +95,7 @@ export class HomePage {
     onCountdownDone() {
         this.timerContentElem.style.display = 'block';
         this.stopButtonElem.style.display = 'block';
-        this.tallyElem.textContent = `POMODOROS FINISHED: ${GlobalSettings.count}`;
+        this.tallyElem.textContent = `POMODOROS FINISHED: ${this.settings.count}`;
     }
 
     onCountdownUpdate(seconds) {
@@ -141,15 +125,6 @@ export class HomePage {
 
     stopAlarm() {
         this.timer.stopAlarm();
-
-        if (this.autoStartBreak) {
-            if (this.timer.count >= 4) {
-                this.timer.count = 0;
-                this.startCountdownTimer(1800, false);
-            } else {
-                this.startCountdownTimer(330, true);
-            }
-        }
     }
 
     openURL(url: string) {
