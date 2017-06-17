@@ -48,6 +48,7 @@ export class HomePage {
         this.timeSelectorElem = document.getElementById('time-selector');
         this.timerContentElem = document.getElementById('timer-content');
         this.tallyElem = document.getElementById('tally');
+        this.tallyElem.textContent = `POMODOROS FINISHED: ${this.settings.count}`;
         this.alarmElem = document.getElementById('alarm');
         this.stopButtonElem = document.getElementById('stop-button');
         this.endTimeElem = document.getElementById('end-time');
@@ -95,7 +96,7 @@ export class HomePage {
     onCountdownDone() {
         this.timerContentElem.style.display = 'block';
         this.stopButtonElem.style.display = 'block';
-        this.tallyElem.textContent = `POMODOROS FINISHED: ${this.settings.count}`;
+        this.tallyElem.textContent = `POMODOROS FINISHED: ${this.settings.tally}`;
     }
 
     onCountdownUpdate(seconds) {

@@ -63,7 +63,7 @@ export class Timer {
                 clearInterval(this.countdown);
 
                 if (!this.isBreak) {
-                    this.count++;
+                    this.settings.count++;
                 }
 
                 this.localNotifications.schedule({

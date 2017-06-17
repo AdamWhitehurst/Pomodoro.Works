@@ -3,7 +3,7 @@
 export class GlobalSettings {
     private static _instance = null;
 
-    private _count: number = 0;
+    private _tally: number = 0;
     private _alarmUrl: string = 'assets/sounds/kitchen_timer.mp3';
     private _notesText: string = 'NOTES AND STUFF';
     private _reminderNotificationEnabled: boolean = false;
@@ -23,10 +23,10 @@ export class GlobalSettings {
                 }.bind(this)
             );
 
-            this.storage.get('countNum').then(
+            this.storage.get('tally').then(
                 function (value) {
                     if (value) {
-                        this._count = value;
+                        this._tally = value;
                     }
                 }.bind(this)
             );
@@ -67,12 +67,12 @@ export class GlobalSettings {
     }
 
     public get count() {
-        return this._count;
+        return this._tally;
     }
 
-    public set count(count: number) {
-        this._count += count;
-        this.storage.set('count', this._count);
+    public set count(tally: number) {
+        this._tally = tally;
+        this.storage.set('count', this._tally);
     }
 
     public get alarmUrl() {
