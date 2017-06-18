@@ -5,7 +5,7 @@ import { LocalNotifications } from '@ionic-native/local-notifications';
 import { NativeAudio } from "@ionic-native/native-audio";
 import { Timer } from "../../lib/timer";
 import { Storage } from '@ionic/storage';
-import { GlobalSettings } from '../../lib/settings';
+import { GlobalSettings, SettingsModal } from '../../lib/settings';
 
 declare var cordova: any;
 
@@ -48,7 +48,7 @@ export class HomePage {
         this.timeSelectorElem = document.getElementById('time-selector');
         this.timerContentElem = document.getElementById('timer-content');
         this.tallyElem = document.getElementById('tally');
-        this.tallyElem.textContent = `POMODOROS FINISHED: ${this.settings.count}`;
+        this.tallyElem.textContent = `POMODOROS FINISHED: ${this.settings.tally}`;
         this.alarmElem = document.getElementById('alarm');
         this.stopButtonElem = document.getElementById('stop-button');
         this.endTimeElem = document.getElementById('end-time');
@@ -64,15 +64,26 @@ export class HomePage {
         var popup = this.alertCtrl.create({
             title: 'Pomodoro.Works Timer App',
             subTitle: 'By Adam Whitehurst',
-            message: '<p> Visit the main website:</br><a href="http://pomodoro.works/">Pomodoro.Works</a></br></br>Endless thanks to Sean Martz and the Coding Blocks Slack Community:</br><a href="http://codingblocks.slack.com/">CodingBlocks.Slack.com</a></p>',
+            message: '<p> Based on the work of Sean Martz. Visit the main website:</br><a href="http://pomodoro.works/">Pomodoro.Works</a></br></br>Endless thanks to Sean Martz and the Coding Blocks Slack Community:</br><a href="http://codingblocks.slack.com/">CodingBlocks.Slack.com</a></p>',
             cssClass: 'credits-alert',
             buttons: ['OK']
         });
         popup.present();
     }
 
-    selectRingtone() {
-        this.timer.selectRingtone();
+    presentModal(name: string) {
+        var modal;
+
+        switch (name) {
+            case 'ringtones':
+                this.timer.selectRingtone();
+                break;
+            case 'settings':
+                modal = this.modalCtrl.create(SettingsModal);
+                modal.present();
+                break;
+
+        }
     }
 
     saveNotes() {

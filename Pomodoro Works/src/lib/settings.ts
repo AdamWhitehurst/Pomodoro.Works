@@ -1,4 +1,6 @@
-﻿import { Storage } from '@ionic/storage';
+﻿import { Component } from "@angular/core";
+import { ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
+import { Storage } from '@ionic/storage';
 
 export class GlobalSettings {
     private static _instance = null;
@@ -66,11 +68,11 @@ export class GlobalSettings {
         }
     }
 
-    public get count() {
+    public get tally() {
         return this._tally;
     }
 
-    public set count(tally: number) {
+    public set tally(tally: number) {
         this._tally = tally;
         this.storage.set('count', this._tally);
     }
@@ -109,6 +111,45 @@ export class GlobalSettings {
     public set autoStartBreak(autoStartBreak: boolean) {
         this._autoStartBreak = autoStartBreak;
         this.storage.set('autoStartBreak', this._autoStartBreak);
+    }
+}
+
+@Component({
+    template: `
+<ion-header>
+  <ion-toolbar color="tertiary">
+    <ion-title>
+      Settings
+    </ion-title>
+    <ion-buttons start>
+      <button ion-button (click)="this.viewCtrl.dismiss()">
+        <span ion-text color="primary" showWhen="ios">Cancel</span>
+        <ion-icon name="md-close" showWhen="android, windows"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content color="secondary">
+  <ion-item>
+    <ion-label>Auto-Start Break</ion-label>
+    <ion-checkbox color="danger" checked="false"></ion-checkbox>
+  </ion-item>
+  <ion-item>
+    <ion-label>Reminder Notification Enabled</ion-label>
+    <ion-checkbox color="danger" checked="false"></ion-checkbox>
+  </ion-item>
+  <button ion-button color="light">Reset Tally</button>
+</ion-content>
+`
+})
+export class SettingsModal {
+    private settings: GlobalSettings;
+
+    constructor(
+        private viewCtrl: ViewController,
+        private navParams: NavParams
+    ) {
+        this.settings = GlobalSettings.instance();
     }
 
 }

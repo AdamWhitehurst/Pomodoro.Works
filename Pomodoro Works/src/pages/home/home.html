@@ -39,9 +39,13 @@
   </ion-footer>
 
   <ion-fab bottom right>
-    <button ion-fab mini color="danger"><ion-icon name="settings"></ion-icon></button>
+    <button ion-fab mini color="danger"><ion-icon name="arrow-dropup-circle"></ion-icon></button>
     <ion-fab-list side="top">
-      <button ion-fab (click)="selectRingtone()">
+      <button ion-fab (click)="presentModal('ringtones')">
+        <ion-icon color="green" name="musical-notes">
+        </ion-icon>
+      </button>
+      <button ion-fab (click)="presentModal('settings')">
         <ion-icon color="green" name="musical-notes">
         </ion-icon>
       </button>
