@@ -1,5 +1,6 @@
 ﻿import { Component } from '@angular/core';
 import { ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
+// TODO: Remove above
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { NativeAudio } from '@ionic-native/native-audio';
 
@@ -9,27 +10,27 @@ declare var cordova: any;
 })
 
 export class Alarm {
-    private alarmUrl: string;
-    private lastAudioId: string;
+    private _alarmUrl: string;
+    private _lastAudioId: string;
 
     constructor(
         private nativeAudio: NativeAudio,
-        private url: string
+        private urlString: string
     ) {
-        this.alarmUrl = url;
+        this._alarmUrl = urlString;
     }
 
-    getUrl() {
-        if (this.alarmUrl) return this.alarmUrl;
+    public get url () {
+        if (this._alarmUrl) return this._alarmUrl;
     }
 
-    setUrl(url: string) {
+    public set url (url: string) {
         if (url) {
-            this.alarmUrl = url;
+            this._alarmUrl = url;
         }
     }
 
-    startAlarm(url: string = this.alarmUrl) {
+    startAlarm(url: string = this._alarmUrl) {
         // Stop the previous alarm tone
         this.stopAlarm();
 
@@ -48,8 +49,8 @@ export class Alarm {
         );
     }
 
-    stopAlarm(url: string = this.lastAudioId) {
-        if (this.lastAudioId) {
+    stopAlarm(url: string = this._lastAudioId) {
+        if (this._lastAudioId) {
             return this.nativeAudio.stop(url).catch(
                 function (error) {
                     console.log('stopAlarm failed. ' + error);
@@ -61,7 +62,7 @@ export class Alarm {
     playTone(url: string) {
         return this.nativeAudio.loop(url).then(
             function () {
-                this.lastAudioId = url;
+                this._lastAudioId = url;
             }.bind(this)
         );
     }

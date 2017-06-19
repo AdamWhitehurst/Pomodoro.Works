@@ -11,13 +11,13 @@ export class GlobalSettings {
     private _reminderNotificationEnabled: boolean = false;
     private _autoStartBreak: boolean = false;
 
-    private storage: Storage;
+    private _storage: Storage;
 
     constructor(storage: Storage) {
         if (!GlobalSettings._instance) {
-            this.storage = storage;
+            this._storage = storage;
 
-            this.storage.get('alarmUrl').then(
+            this._storage.get('alarmUrl').then(
                 function (value) {
                     if (value) {
                         this._alarmUrl = value;
@@ -25,7 +25,7 @@ export class GlobalSettings {
                 }.bind(this)
             );
 
-            this.storage.get('tally').then(
+            this._storage.get('tally').then(
                 function (value) {
                     if (value) {
                         this._tally = value;
@@ -33,7 +33,7 @@ export class GlobalSettings {
                 }.bind(this)
             );
 
-            this.storage.get('notesText').then(
+            this._storage.get('notesText').then(
                 function (value) {
                     if (value) {
                         this._notes = value;
@@ -41,7 +41,7 @@ export class GlobalSettings {
                 }.bind(this)
             );
 
-            this.storage.get('reminderNotificationEnabled').then(
+            this._storage.get('reminderNotificationEnabled').then(
                 function (value) {
                     if (value) {
                         this._reminderNotificationEnabled = value;
@@ -49,7 +49,7 @@ export class GlobalSettings {
                 }.bind(this)
             );
 
-            this.storage.get('autoStartBreak').then(
+            this._storage.get('autoStartBreak').then(
                 function (value) {
                     if (value) {
                         this._autoStartBreak = value;
@@ -74,7 +74,7 @@ export class GlobalSettings {
 
     public set tally(tally: number) {
         this._tally = tally;
-        this.storage.set('count', this._tally);
+        this._storage.set('tally', this._tally);
     }
 
     public get alarmUrl() {
@@ -83,7 +83,7 @@ export class GlobalSettings {
 
     public set alarmUrl(newUrl: string) {
         this._alarmUrl = newUrl;
-        this.storage.set('alarmUrl', this._alarmUrl);
+        this._storage.set('alarmUrl', this._alarmUrl);
     }
 
     public get notes() {
@@ -92,7 +92,7 @@ export class GlobalSettings {
 
     public set notes(notesText: string) {
         this._notesText = notesText;
-        this.storage.set('notesText', this._notesText);
+        this._storage.set('notesText', this._notesText);
     }
 
     public get reminderNotificationEnabled() {
@@ -101,16 +101,16 @@ export class GlobalSettings {
 
     public set reminderNotificationEnabled(reminderNotificationEnabled: boolean) {
         this._reminderNotificationEnabled = reminderNotificationEnabled;
-        this.storage.set('reminderNotificationEnabled', this._reminderNotificationEnabled);
+        this._storage.set('reminderNotificationEnabled', this._reminderNotificationEnabled);
     }
 
     public get autoStartBreak() {
-        return this._reminderNotificationEnabled;
+        return this._autoStartBreak;
     }
 
     public set autoStartBreak(autoStartBreak: boolean) {
         this._autoStartBreak = autoStartBreak;
-        this.storage.set('autoStartBreak', this._autoStartBreak);
+        this._storage.set('autoStartBreak', this._autoStartBreak);
     }
 }
 
@@ -132,24 +132,41 @@ export class GlobalSettings {
 <ion-content color="secondary">
   <ion-item>
     <ion-label>Auto-Start Break</ion-label>
-    <ion-checkbox color="danger" checked="false"></ion-checkbox>
+    <ion-checkbox color="danger" [(ngModel)]="autoStartEnabled" (ionChange)="applySetting('autoStartEnabled')"></ion-checkbox>
   </ion-item>
   <ion-item>
     <ion-label>Reminder Notification Enabled</ion-label>
-    <ion-checkbox color="danger" checked="false"></ion-checkbox>
+    <ion-checkbox color="danger" [(ngModel)]="reminderNotificationEnabled" (ionChange)="applySetting('reminderNotificationEnabled')"></ion-checkbox>
   </ion-item>
-  <button ion-button color="light">Reset Tally</button>
+  <button ion-button color="light" click="applySetting('tally')" >Reset Tally</button>
 </ion-content>
 `
 })
 export class SettingsModal {
-    private settings: GlobalSettings;
+    private _settings: GlobalSettings;
+    autoStartEnabled: boolean;
+    reminderNotificationEnabled: boolean;
 
     constructor(
         private viewCtrl: ViewController,
         private navParams: NavParams
     ) {
-        this.settings = GlobalSettings.instance();
+        this._settings = GlobalSettings.instance();
+        this.autoStartEnabled = this._settings.autoStartBreak;
+        this.reminderNotificationEnabled = this._settings.reminderNotificationEnabled;
     }
 
+    applySetting(name: string) {
+        switch (name) {
+            case 'autoStartEnabled':
+                this._settings.autoStartBreak = this.autoStartEnabled;
+                break;
+            case 'reminderNotificationEnabled':
+                this._settings.reminderNotificationEnabled = this.reminderNotificationEnabled;
+                break;
+            case 'tally':
+                this._settings.tally = 0;
+                break;
+        }
+    }
 }

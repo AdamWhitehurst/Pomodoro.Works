@@ -3,7 +3,7 @@
 import { GlobalSettings } from './settings';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { Component } from "@angular/core";
-import { ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
+import { Platform, NavParams, ViewController } from 'ionic-angular';
 import { NativeAudio } from "@ionic-native/native-audio";
 import { Alarm } from "./alarm";
 declare var cordova: any;
@@ -12,21 +12,20 @@ declare var cordova: any;
 })
 
 export class Timer {
-    private alarm: Alarm;
-    private isBreak: boolean = false;
-    private endTime;
-    private updateCallback;
-    private endCallback;
-    private countdown;
-    private settings;
+    private _alarm: Alarm;
+    private _isBreak: boolean = false;
+    private _endtime;
+    private _updateCallback;
+    private _endCallback;
+    private _countdown;
+    private _settings;
 
     constructor(
         private localNotifications: LocalNotifications,
-        private modalCtrl: ModalController,
         private nativeAudio: NativeAudio
     ) {
-        this.settings = GlobalSettings.instance();
-        this.alarm = new Alarm(nativeAudio, this.settings.alarmUrl);
+        this._settings = GlobalSettings.instance();
+        this._alarm = new Alarm(nativeAudio, this._settings.alarmUrl);
 
         // Listen to notification events
         this.localNotifications.on('trigger', function (notification, state) {
@@ -39,31 +38,26 @@ export class Timer {
 
     }
 
-    selectRingtone() {
-        var modal = this.modalCtrl.create(RingtoneSelectModal, { alrm: this.alarm });
-        modal.onDidDismiss(function (url) {
-            this.alarm.stopAlarm();
-            this.alarm.setUrl(url);
-        }.bind(this));
-        modal.present();
+    public get alarm() {
+        return this._alarm;
     }
 
-    startCountdown(endTime: number, isBreak: boolean, updateCallback, endCallback) {
-        this.endTime = endTime;
-        this.updateCallback = updateCallback;
-        this.endCallback = endCallback;
-        this.isBreak = isBreak;
+    startCountdown(endtime: number, isBreak: boolean, updateCallback, endCallback) {
+        this._endtime = endtime;
+        this._updateCallback = updateCallback;
+        this._endCallback = endCallback;
+        this._isBreak = isBreak;
 
         this.stopAlarm();
 
-        this.countdown = setInterval(function () {
-            const secondsLeft = Math.round((this.endTime - Date.now()) / 1000);
+        this._countdown = setInterval(function () {
+            const secondsLeft = Math.round((this._endtime - Date.now()) / 1000);
 
             if (secondsLeft <= 0) {
-                clearInterval(this.countdown);
+                clearInterval(this._countdown);
 
-                if (!this.isBreak) {
-                    this.settings.count++;
+                if (!this._isBreak) {
+                    this._settings.tally++;
                 }
 
                 this.localNotifications.schedule({
@@ -71,16 +65,16 @@ export class Timer {
                     icon: 'file://assets/icon/icon.png',
                     title: 'Your Pomodoro Sprint is Over!',
                     text: 'Your sprint is done. Take a break, you winner.',
-                    sound: this.alarm.getUrl(),
+                    sound: this.alarm.url,
                     led: 'FF0000'
                 });
 
                 this.playAlarm();
-                this.endCallback();
+                this._endCallback();
 
                 return;
             }
-            this.updateCallback(secondsLeft);
+            this._updateCallback(secondsLeft);
 
         }.bind(this), 1000);
     }
@@ -88,14 +82,14 @@ export class Timer {
     onNotificationTriggered(notification: any, state: any) {
         navigator.vibrate(1000);
 
-        if (notification.id == 0 && this.settings.reminderNotificationEnabled) {
+        if (notification.id == 0 && this._settings.reminderNotificationEnabled) {
             this.localNotifications.schedule({
                 id: 1,
                 at: new Date(new Date().getTime() + 60000),
                 icon: 'file://assets/icon/icon.png',
                 title: 'Reminder: Your Pomodoro Sprint is Over!',
                 text: 'This is a reminder that your sprint is done.',
-                sound: this.alarm.getUrl(),
+                sound: this.alarm.url,
                 led: 'FF0000'
             });
         }
@@ -107,6 +101,7 @@ export class Timer {
     }
 
     onNotificationCleared() {
+        this.stopAlarm();
         this.clearAndCancelNotifications();
     }
 
@@ -127,7 +122,7 @@ export class Timer {
       Select a Ringtone
     </ion-title>
     <ion-buttons start>
-      <button ion-button (click)="this.viewCtrl.dismiss()">
+      <button ion-button (click)="close()">
         <span ion-text color="primary" showWhen="ios">Cancel</span>
         <ion-icon name="md-close" showWhen="android, windows"></ion-icon>
       </button>
@@ -139,7 +134,7 @@ export class Timer {
       <ion-item color="secondary" *ngFor="let tone of ALARM_LIST">
         <ion-title><h2 style="color: #ffffff;">{{tone.Name}}</h2></ion-title>
         <ion-note item-end>
-          <button ion-button color="blue" (click)="this.viewCtrl.dismiss(tone.Url)"><ion-icon color="white" name="checkmark"> Select</ion-icon> </button>
+          <button ion-button color="blue" (click)="close(tone.Url)"><ion-icon color="white" name="checkmark"> Select</ion-icon> </button>
           <button ion-button color="green" (click)="play(tone.Url)"><ion-icon color="white" name="musical-note"> Play</ion-icon> </button>
           <button ion-button color="danger" (click)="stop(tone.Url)"><ion-icon color="white" name="close"> Stop</ion-icon> </button>
         </ion-note>
@@ -168,6 +163,15 @@ export class RingtoneSelectModal {
 
     get ALARM_LIST() {
         return ALARM_LIST;
+    }
+
+    close(url: string) {
+        if (url) {
+            this.alarm.url = url;
+        }
+
+        this.alarm.stopAlarm();
+        this.viewCtrl.dismiss();
     }
 }
 

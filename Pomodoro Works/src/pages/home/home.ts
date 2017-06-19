@@ -3,7 +3,7 @@ import { InAppBrowser, File } from 'ionic-native';
 import { AlertController, NavController, ModalController, Platform, NavParams, ViewController } from 'ionic-angular';
 import { LocalNotifications } from '@ionic-native/local-notifications';
 import { NativeAudio } from "@ionic-native/native-audio";
-import { Timer } from "../../lib/timer";
+import { Timer, RingtoneSelectModal } from "../../lib/timer";
 import { Storage } from '@ionic/storage';
 import { GlobalSettings, SettingsModal } from '../../lib/settings';
 
@@ -43,7 +43,7 @@ export class HomePage {
 
     ionViewDidLoad() {
         // Initialize the timer
-        this.timer = new Timer(this.localNotification, this.modalCtrl, this.nativeAudio);
+        this.timer = new Timer(this.localNotification, this.nativeAudio);
         // Reference elements
         this.timeSelectorElem = document.getElementById('time-selector');
         this.timerContentElem = document.getElementById('timer-content');
@@ -60,14 +60,21 @@ export class HomePage {
         }.bind(this));
     }
 
-    presentCreditsAlert() {
-        var popup = this.alertCtrl.create({
-            title: 'Pomodoro.Works Timer App',
-            subTitle: 'By Adam Whitehurst',
-            message: '<p> Based on the work of Sean Martz. Visit the main website:</br><a href="http://pomodoro.works/">Pomodoro.Works</a></br></br>Endless thanks to Sean Martz and the Coding Blocks Slack Community:</br><a href="http://codingblocks.slack.com/">CodingBlocks.Slack.com</a></p>',
-            cssClass: 'credits-alert',
-            buttons: ['OK']
-        });
+    presentAlert(name: string) {
+        var popup;
+
+        switch (name) {
+            case 'credits':
+                popup = this.alertCtrl.create({
+                    title: 'Pomodoro.Works Timer App',
+                    subTitle: 'By Adam Whitehurst',
+                    message: '<p> Based on the work of Sean Martz. Visit the main website:</br><a href="http://pomodoro.works/">Pomodoro.Works</a></br></br>Endless thanks to Sean Martz and the Coding Blocks Slack Community:</br><a href="http://codingblocks.slack.com/">CodingBlocks.Slack.com</a></p>',
+                    cssClass: 'credits-alert',
+                    buttons: ['OK']
+                });
+                break;
+        }
+
         popup.present();
     }
 
@@ -76,14 +83,15 @@ export class HomePage {
 
         switch (name) {
             case 'ringtones':
-                this.timer.selectRingtone();
+                modal = this.modalCtrl.create(RingtoneSelectModal, { alrm: this.timer.alarm });
                 break;
             case 'settings':
                 modal = this.modalCtrl.create(SettingsModal);
-                modal.present();
                 break;
 
         }
+
+        modal.present();
     }
 
     saveNotes() {
@@ -132,10 +140,6 @@ export class HomePage {
     onStopButtonClick() {
         this.timerContentElem.style.display = 'none';
         this.timer.clearAndCancelNotifications();
-        this.stopAlarm();
-    }
-
-    stopAlarm() {
         this.timer.stopAlarm();
     }
 
