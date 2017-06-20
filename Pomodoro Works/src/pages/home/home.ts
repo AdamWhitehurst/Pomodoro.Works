@@ -15,7 +15,7 @@ declare var cordova: any;
 })
 
 export class HomePage {
-    autoStartBreak: boolean;
+    private _isBreak: boolean;
     timer: Timer;
     settings: GlobalSettings;
 
@@ -103,9 +103,10 @@ export class HomePage {
     startCountdownTimer(seconds: number, isBreak: boolean) {
         const startTime = Date.now();
         const endTime = startTime + (seconds * 1000);
+        this._isBreak = isBreak;
 
         if (this.timer) {
-            this.timer.startCountdown(endTime, isBreak, this.onCountdownUpdate.bind(this), this.onCountdownDone.bind(this));
+            this.timer.startCountdown(endTime, this._isBreak, this.onCountdownUpdate.bind(this), this.onCountdownDone.bind(this));
             this.timerContentElem.style.display = 'block';
             this.displayTimeLeft(seconds);
             this.displayEndTime(endTime);
@@ -141,6 +142,9 @@ export class HomePage {
         this.timerContentElem.style.display = 'none';
         this.timer.clearAndCancelNotifications();
         this.timer.stopAlarm();
+        if (this.settings.autoStartBreak && !this._isBreak) {
+            this.startCountdownTimer(300, true);
+        }
     }
 
     openURL(url: string) {
