@@ -14,7 +14,7 @@ declare var cordova: any;
 export class Timer {
     private _alarm: Alarm;
     private _isBreak: boolean = false;
-    private _endtime;
+    private _duration: number;
     private _updateCallback;
     private _endCallback;
     private _countdown;
@@ -42,16 +42,22 @@ export class Timer {
         return this._alarm;
     }
 
-    startCountdown(endtime: number, isBreak: boolean, updateCallback, endCallback) {
-        this._endtime = endtime;
+    startCountdown(duration: number, isBreak: boolean, updateCallback, endCallback) {
+        // End the previous countdown and/or alarm if one is playing
+        clearInterval(this._countdown);
+        this.stopAlarm();
+        // Save the duration and callbacks
+        this._duration = duration;
         this._updateCallback = updateCallback;
         this._endCallback = endCallback;
         this._isBreak = isBreak;
+        // Create the new countdown
+        this._countdown = setInterval(this.countdownUpdate.bind(this), 1000);
+    }
 
-        this.stopAlarm();
-
-        this._countdown = setInterval(function () {
-            const secondsLeft = Math.round((this._endtime - Date.now()) / 1000);
+    countdownUpdate() {
+        {
+            const secondsLeft = Math.round((this._duration - Date.now()) / 1000);
 
             if (secondsLeft <= 0) {
                 clearInterval(this._countdown);
@@ -74,9 +80,10 @@ export class Timer {
 
                 return;
             }
+
             this._updateCallback(secondsLeft);
 
-        }.bind(this), 1000);
+        }
     }
 
     onNotificationTriggered(notification: any, state: any) {
@@ -105,7 +112,7 @@ export class Timer {
         this.clearAndCancelNotifications();
     }
 
-    playAlarm(url: string) {
+    playAlarm(url: string = this.alarm.url) {
         this.alarm.startAlarm(url);
     }
 

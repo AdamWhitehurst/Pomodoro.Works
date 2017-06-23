@@ -101,25 +101,37 @@ export class HomePage {
     }
 
     startCountdownTimer(seconds: number, isBreak: boolean) {
-        const startTime = Date.now();
-        const endTime = startTime + (seconds * 1000);
-
         if (this.timer) {
+            const startTime = Date.now();
+            const endTime = startTime + (seconds * 1000);
+
+            this.endCountdown();
             this.timer.startCountdown(endTime, isBreak, this.onCountdownUpdate.bind(this), this.onCountdownDone.bind(this));
-            this.timerContentElem.style.display = 'block';
+            this.displayTimerContent();
             this.displayTimeLeft(seconds);
             this.displayEndTime(endTime);
         }
     }
 
+    endCountdown() {
+        this.timerContentElem.style.display = 'none';
+        this.timer.clearAndCancelNotifications();
+        this.timer.stopAlarm();
+    }
+
     onCountdownDone() {
-        this.timerContentElem.style.display = 'block';
-        this.stopButtonElem.style.display = 'block';
-        this.tallyElem.textContent = `POMODOROS FINISHED: ${this.settings.tally}`;
+        this.displayTimerContent();
     }
 
     onCountdownUpdate(seconds) {
         this.displayTimeLeft(seconds);
+    }
+
+    displayTimerContent() {
+        this.timerContentElem.style.display = 'block';
+        this.stopButtonElem.style.display = 'block';
+        this.tallyElem.textContent = `POMODOROS FINISHED: ${this.settings.tally}`;
+        this.displayTimeLeft(0);
     }
 
     displayTimeLeft(seconds) {
@@ -135,12 +147,6 @@ export class HomePage {
         const hours = q.getHours();
         const minutes = q.getMinutes();
         this.endTimeElem.textContent = `End time: ${hours > 12 ? hours - 12 : hours}:${minutes < 10 ? '0' : ''}${minutes}`;
-    }
-
-    onStopButtonClick() {
-        this.timerContentElem.style.display = 'none';
-        this.timer.clearAndCancelNotifications();
-        this.timer.stopAlarm();
     }
 
     openURL(url: string) {

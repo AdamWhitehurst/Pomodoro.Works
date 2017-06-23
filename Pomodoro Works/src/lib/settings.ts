@@ -138,7 +138,7 @@ export class GlobalSettings {
     <ion-label>Reminder Notification Enabled</ion-label>
     <ion-checkbox color="danger" [(ngModel)]="reminderNotificationEnabled" (ionChange)="applySetting('reminderNotificationEnabled')"></ion-checkbox>
   </ion-item>
-  <button ion-button color="light" click="applySetting('tally')" >Reset Tally</button>
+  <button ion-button color="light" click="applySetting('tally')"> Reset Tally </button>
 </ion-content>
 `
 })
